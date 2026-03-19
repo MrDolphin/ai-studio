@@ -6,3 +6,8 @@ coverage/
 *.log
 .env*
 !.env.example
+.vscode/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
