@@ -1,0 +1,52 @@
+# 部署纯前端 UI 到 GitHub Pages
+name: Deploy UI to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+# 允许这个脚本去修改你的 Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 控制并发部署，防止前面的部署把后面的挤掉
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy-ui-only:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Config GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload dist folder
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
